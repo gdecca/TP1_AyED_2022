@@ -1,0 +1,112 @@
+#include<iostream>
+#include<fstream>
+using namespace std;
+
+
+void mostrar(string vec[], int dim)
+{
+	for (int i = 0; i < dim; ++i)
+		cout << "vec[" << i << "] = " << vec[i] << endl;
+}
+
+void mostrar(int vec[], int dim) //Notar, mismo nombre pero distintos parÃ¡metros
+{
+	for (int i = 0; i < dim; ++i)
+		cout << "vec[" << i << "] = " << vec[i] << endl;
+}
+
+
+/*
+void mostrarmat(float m[][], int cantClientes, int cantProductos)
+{
+	for (int i = 0; i < cantClientes; ++i) {
+		for (int j = 0; j < cantProductos; ++j)
+			cout << m[i][j] << '\t';
+		cout << endl;
+	}
+}
+*/
+
+int main()
+{
+	const int nroCliente {8};
+	const int nroProducto {5};
+	float pesoTotal[nroCliente][nroProducto] {};//total pesos Cliente/Producto
+	float distanciaTotal[nroCliente][nroProducto] {};//total dist Cliente/Prod
+	string cliente[nroCliente]; //nombre clientes
+	string producto[nroProducto]; //nombre producto
+
+
+	ifstream archivoLect;  //input file stream: para lectura 
+	archivoLect.open("Nombres.txt");  //abre archivo
+
+	//Leo el archivo de nombres y tipos productos
+	if (!archivoLect) {  //control de apertura del archivo
+		cout << "Error al abrir el archivo" << endl; 
+		return 1; 
+	}
+	for (int i = 0; i < nroCliente && archivoLect >> cliente[i]; ++i);
+	for (int i = 0; i < nroProducto && archivoLect >> producto[i]; ++i);
+//	if (debug) {
+		mostrar(cliente, nroCliente);
+		cout << "\n============================\n" << endl;
+		mostrar(producto, nroProducto);
+//	}
+	archivoLect.close();
+
+	//Leo el archivo con los datos de distribucion
+	archivoLect.open("datosDistribucion.txt");
+	if (!archivoLect) {
+		cout << "Error al tratar de abrir el archivo de producciÃ³n" << endl;
+		return 1;
+	}
+	int iCliente, jProducto;
+	float iPeso, iDistancia;
+	while (archivoLect >> iCliente >> jProducto >> iPeso >> iDistancia) {
+		pesoTotal[iCliente][jProducto] += iPeso;
+		distanciaTotal[iCliente][jProducto] += iDistancia;
+	}
+	archivoLect.close();
+
+//	if (debug) {
+	cout << "\n===============Pesos Totales=============\n" << endl;
+	for (int i = 0; i < nroCliente; ++i) {
+		for (int j = 0; j < nroProducto; ++j)
+			cout << pesoTotal[i][j] << '\t';
+		cout << endl;
+	}
+
+	cout << "\n===============Distancias totales=============\n" << endl;
+	for (int i = 0; i < nroCliente; ++i) {
+		for (int j = 0; j < nroProducto; ++j)
+			cout << distanciaTotal[i][j] << '\t';
+		cout << endl;
+	}
+	
+	//Pto 1
+	const float pesoTransportado {13000};
+	
+	cout << "Listado por clientes, de los tipos de productos que superan los "
+	<< pesoTransportado << "kg. acumulados: " << endl;
+	int Cant[] = {nroCliente};
+		
+	for (int i = 0; i < nroCliente; i++){
+		cout << cliente[i] << ": ";
+			int cant = 0;
+			for (int j = 0; j < nroProducto; j++){
+				if(pesoTotal[i][j] > pesoTransportado){
+					cout << producto[j] << ", ";
+					cant++;
+				}
+			}
+		cout << endl;	
+		Cant[i] = cant;
+	}
+	for (int i=0; i < nroCliente; i++)
+		cout << cliente[i] << ": " << Cant[i] << endl;
+	
+	//Pto 2
+	
+	
+	return 0;
+}
